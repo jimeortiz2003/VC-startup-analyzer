@@ -13,11 +13,11 @@ This project develops a **VC Fit Score**—a composite metric integrating fundin
 
 ## Project Goals
 
-✅ Clean and merge real-world Crunchbase-like datasets  
-✅ Engineer meaningful features such as total funding, number of rounds, company age, investor count, and acquisition data  
-✅ Develop a **VC Fit Score** to rank startups  
-✅ Visualize score distributions and relationships  
-✅ Incorporate M&A analysis to highlight exit dynamics  
+- Clean and merge real-world Crunchbase-like datasets
+- Engineer meaningful features such as total funding, number of rounds, company age, investor count, and acquisition data
+- Develop a **VC Fit Score** to rank startups
+- Visualize score distributions and relationships
+- Incorporate M&A analysis to highlight exit dynamics  
 
 ---
 
