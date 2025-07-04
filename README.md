@@ -1,10 +1,10 @@
-# 🚀 VC Startup Analyzer
+# VC Startup Analyzer
 
 A data-driven tool to evaluate early-stage startups for investment readiness, tailored for aspiring venture capitalists, analysts, and anyone passionate about startup ecosystems.
 
 ---
 
-## 🎯 Problem Statement
+## Problem Statement
 
 Early-stage investors face *information overload* and *inconsistent data* when screening startups. The lack of standardized metrics makes it difficult to compare companies objectively.  
 This project develops a **VC Fit Score**—a composite metric integrating funding traction, investor engagement, and startup maturity—to help identify promising companies in large datasets.
