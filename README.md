@@ -23,14 +23,15 @@ This project develops a **VC Fit Score**—a composite metric integrating fundin
 
 ## Project Structure
 
-/
-├── data/
-│ ├── raw/ # Original CSVs
-│ └── processed/ # Cleaned and scored datasets
-├── notebooks/ # Jupyter/Colab notebooks
-├── src/ # Python modules (e.g., cleaning, scoring)
-├── outputs/ # Plots and exports
-├── README.md # This file
+| Folder/File         | Description                                   |
+|----------------------|-----------------------------------------------|
+| `/data/raw/`         | Original CSV datasets                        |
+| `/data/processed/`   | Cleaned and scored datasets                  |
+| `/notebooks/`        | Jupyter or Colab notebooks                   |
+| `/src/`              | Python modules (e.g., cleaning, scoring)     |
+| `/outputs/`          | Plots and exports                            |
+| `README.md`          | This file                                    |
+
 
 ---
 
