@@ -7,17 +7,17 @@ A data-driven tool to evaluate early-stage startups for investment readiness, ta
 ## Problem Statement
 
 Early-stage investors face *information overload* and *inconsistent data* when screening startups. The lack of standardized metrics makes it difficult to compare companies objectively.  
-This project develops a **VC Fit Score**—a composite metric integrating funding traction, investor engagement, and startup maturity—to help identify promising companies in large datasets.
+This project develops a **VC Fit Score**—a composite metric integrating funding traction, investor engagement, startup maturity, and exit history—to help identify promising companies in large datasets.
 
 ---
 
 ## Project Goals
 
-- Clean and merge real-world Crunchbase-like datasets  
-- Engineer meaningful features such as total funding, number of rounds, company age, and investor count  
-- Develop a **VC Fit Score** to rank startups  
-- Visualize score distributions and relationships  
-- Share insights to illustrate patterns in early-stage venture funding  
+✅ Clean and merge real-world Crunchbase-like datasets  
+✅ Engineer meaningful features such as total funding, number of rounds, company age, investor count, and acquisition data  
+✅ Develop a **VC Fit Score** to rank startups  
+✅ Visualize score distributions and relationships  
+✅ Incorporate M&A analysis to highlight exit dynamics  
 
 ---
 
@@ -32,21 +32,18 @@ This project develops a **VC Fit Score**—a composite metric integrating fundin
 | `/outputs/`          | Plots and exports                            |
 | `README.md`          | This file                                    |
 
-
 ---
 
-## Analysis Workflow
+## 📈 Analysis Workflow
 
-### 1️. Data Loading
+### 1️⃣ Data Loading
 
 I combined **five datasets**:
 - `companies`: metadata about companies
 - `rounds`: funding rounds
 - `investments`: investor participation
-- `acquisitions`: M&A data
+- `acquisitions`: M&A activity
 - `addition`: additional fields (if available)
-
-Each file contained partial information—**the challenge was to merge them into a coherent view without duplicating or losing records.**
 
 ---
 
@@ -56,32 +53,32 @@ Key steps:
 - Removed funding rounds missing `raised_amount_usd`
 - Converted amounts to numeric types
 - Parsed founding dates
-- Merged datasets on `company_permalink` keys
-- Filled missing numeric fields with appropriate values (e.g., median age, 0 investors)
+- Merged datasets on `company_permalink`
+- Created flags for acquisition events
+- Filled missing numeric fields appropriately
 
 > **Insight:**  
-> In many real datasets, more than half of the funding rounds are missing dollar amounts. This illustrates why venture analysts often spend significant time cleaning data before any modeling.
+> In real datasets, large proportions of funding or acquisition details are missing or partial, highlighting why venture data cleaning is non-trivial.
 
 ---
 
 ### 3️. Feature Engineering
 
 I computed:
-- **Total Funding (USD)**: cumulative capital raised
+- **Total Funding (USD):** cumulative capital raised
 - **Number of Funding Rounds**
 - **Number of Investors**
 - **Company Age (Years)**
+- **Was Acquired:** 1 if company exited via acquisition
+- **Total Acquisition Price**
 
-These variables were normalized to **0–100 scales** to allow balanced combination.
-
-> **Insight:**  
-> Even when funding is disclosed, the number of investors often varies widely. This dimension is important to understand syndicate depth, not just headline funding.
+Each metric was normalized to a 0–100 scale for comparability.
 
 ---
 
 ### 4️. VC Fit Score
 
-The **VC Fit Score** formula:
+**Base VC Fit Score formula:**
 
 0.4 × Funding Score
 
@@ -92,13 +89,14 @@ The **VC Fit Score** formula:
 0.1 × Age Score
 
 
-This reflects an assumption:
-- Funding traction is the strongest indicator.
-- Engagement of multiple investors signals validation.
-- Company age provides context but carries less predictive weight.
+**Adjusted VC Fit Score:**
+To account for exit success, I created an adjusted score:
+
+VC Fit Score + 10 points if acquired
+
 
 > **Critical thinking:**  
-> This weighting can be adjusted for different strategies—seed funds might weigh age and rounds more heavily, while growth-stage funds would emphasize cumulative capital.
+> This adjustment rewards companies with realized exits while preserving underlying traction metrics.
 
 ---
 
@@ -109,56 +107,69 @@ This reflects an assumption:
 ![Distribution](outputs/distribution_vc_fit_scores.png)
 
 **Interpretation:**
-- The distribution is highly **right-skewed**.
-- Most startups have very low VC Fit Scores.
-- Only a small subset shows significant traction.
-
-> **What this means:**  
-> This pattern reflects the “power law” dynamic in venture capital: a tiny fraction of startups capture most of the investment and attention. The scoring system effectively surfaces these outliers.
+- Highly right-skewed: most startups have low scores.
+- Reflects the power-law distribution common in venture outcomes.
+- Only a small fraction have high traction and funding.
 
 ---
 
-### 2. Funding vs. Number of Investors
+### 2. VC Fit Scores by Acquisition Status
 
-![Scatter](outputs/funding_vs_investors.png)
+![Boxplot](outputs/boxplot_vc_fit_score_acquisition.png)
 
 **Interpretation:**
-- While there is some positive correlation between funding and investor count, the relationship is **far from linear**.
-- A few companies raised large amounts from only a small syndicate.
-
-> **What this means:**  
-> High funding is not always coupled with a diverse investor base. This can highlight startups with strong backing from a single major investor versus those with broader syndication.
+- Startups that were acquired have **higher median VC Fit Scores**.
+- This supports the idea that strong early traction correlates with eventual exits.
+- However, there is overlap: some low-score startups were acquired opportunistically.
 
 ---
 
-### 3. VC Fit Score by Industry
+### 3. Distribution of Acquisition Prices
 
-![Boxplot](outputs/score_by_industry.png)
+![Histogram](outputs/histogram_acquisition_prices.png)
 
 **Interpretation:**
-- Software and E-Commerce companies tend to have higher median scores.
-- Biotech shows a wider spread, reflecting its “moonshot” dynamic.
+- Most exits occur at relatively modest prices.
+- A handful of very large acquisitions (> $1B) create a long tail.
+- This highlights the concentration of value creation among a few outliers.
 
-> **What this means:**  
-> Industry segmentation reveals risk-return patterns—some sectors produce consistent traction, while others are more volatile.
+---
+
+### 4. Top 10 Startups by Adjusted VC Fit Score
+
+| Company Name       | VC Fit Score | Adjusted VC Fit Score | Was Acquired |
+|--------------------|--------------|-----------------------|--------------|
+| Alibaba            | 63.29        | 63.29                 | No           |
+| Aperto Networks    | 52.93        | 62.93                 | Yes          |
+| Airbnb             | 53.11        | 53.11                 | No           |
+| ACTIVE Network     | 37.61        | 47.61                 | Yes          |
+| Ambit Biosciences  | 31.38        | 41.38                 | Yes          |
+| Accumetrics        | 29.47        | 39.47                 | Yes          |
+| Approva            | 27.31        | 37.31                 | Yes          |
+| Aristos Logic      | 26.29        | 36.29                 | Yes          |
+| Answers Corporation| 26.10        | 36.10                 | Yes          |
+| AirXpanders        | 36.06        | 36.06                 | No           |
+
+> **Interpretation:**
+> Including acquisition outcomes reshuffles rankings and elevates companies with realized exits—a more holistic view of startup success.
 
 ---
 
 ## Future Enhancements
 
 - Integrate web scraping for live Crunchbase or AngelList data
-- Expand the model with additional criteria (e.g., employee count, web traffic, team composition)
-- Build an interactive **Streamlit dashboard** to filter and rank startups in real time
-- Experiment with different weighting schemes to fit varied investment theses  
+- Build an interactive **Streamlit dashboard**
+- Experiment with alternative weighting schemes (e.g., higher exit emphasis)
+- Add NLP models to parse descriptions and market tags  
 
 ---
 
 ## Key Takeaways & Reflections
 
-- **Data gaps are the norm** in early-stage investing datasets.
-- **Careful normalization and weighting** are critical to avoid biasing scores.
-- Visual analysis can surface hidden patterns, such as the concentration of funding among a few companies.
-- A scoring framework is a starting point, not a substitute for human judgment—**context matters.**
+- **Data gaps are the norm** in venture datasets.
+- **Careful normalization and weighting** are critical to avoid bias.
+- Including acquisition data provides a more nuanced perspective on startup outcomes.
+- Visuals reveal strong correlations between funding traction and exits, while also highlighting outliers.
 
 ---
 
@@ -169,3 +180,7 @@ Business Analytics + Finance Student
 Exploring venture capital, fintech, and startup ecosystems.  
 
 If you have feedback or ideas for collaboration, feel free to connect!
+
+
+
+
